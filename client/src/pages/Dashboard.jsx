@@ -11,22 +11,26 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const customers = await API.get("/customers");
-      const products = await API.get("/products");
-      const invoices = await API.get("/invoices");
+      const customersRes = await API.get("/customers");
+      const productsRes = await API.get("/products");
+      const invoicesRes = await API.get("/invoices");
 
-      const totalRevenue = invoices.data.reduce(
-        (acc, inv) => acc + inv.totalAmount,
+      const customers = customersRes.data || [];
+      const products = productsRes.data || [];
+      const invoices = invoicesRes.data.data || [];
+
+      const totalRevenue = invoices.reduce(
+        (acc, invoice) => acc + invoice.totalAmount,
         0
       );
 
       setStats({
-        customers: customers.data.length,
-        products: products.data.length,
+        customers: customers.length,
+        products: products.length,
         revenue: totalRevenue,
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -36,20 +40,38 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="grid grid-cols-3 gap-5">
-        <Card title="Customers" value={stats.customers} />
-        <Card title="Products" value={stats.products} />
-        <Card title="Revenue" value={`₹${stats.revenue}`} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <Card
+          title="Customers"
+          value={stats.customers}
+        />
+
+        <Card
+          title="Products"
+          value={stats.products}
+        />
+
+        <Card
+          title="Revenue"
+          value={`₹${stats.revenue}`}
+        />
       </div>
     </DashboardLayout>
   );
 };
 
-const Card = ({ title, value }) => (
-  <div className="bg-white p-5 rounded shadow">
-    <h2 className="text-lg font-semibold">{title}</h2>
-    <p className="text-3xl mt-2">{value}</p>
-  </div>
-);
+const Card = ({ title, value }) => {
+  return (
+    <div className="bg-white p-5 rounded-xl shadow">
+      <h2 className="text-lg font-semibold">
+        {title}
+      </h2>
+
+      <p className="text-3xl mt-3 font-bold">
+        {value}
+      </p>
+    </div>
+  );
+};
 
 export default Dashboard;
