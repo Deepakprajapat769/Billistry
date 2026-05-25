@@ -32,3 +32,11 @@ export const createInvoice = async (data) => {
     totalAmount,
   });
 };
+
+export const getAllInvoices = async () => {
+  const invoices = await Invoice.find()
+    .populate("customerId", "name phone")
+    .populate("items.productId", "name price");
+
+  return invoices;
+};
